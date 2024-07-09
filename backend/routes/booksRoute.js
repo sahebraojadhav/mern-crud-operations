@@ -49,25 +49,31 @@ router.get("/", async (req, res) => {
     }
   });
 
-router.put("/:id", async (req, res) => {
-  try {
-    if (!req.body.title || !req.body.author || !req.body.publishYear) {
-      return res.status(400).send({
-        message: "send all requeried fields:title,author,pubslishYear",
-      });
+  router.put("/:id", async (req, res) => {
+    try {
+      // Validate the required fields
+      if (!req.body.title || !req.body.author || !req.body.publishYear) {
+        return res.status(400).send({
+          message: "Please provide all required fields: title, author, publishYear",
+        });
+      }
+  
+      const { id } = req.params;
+      // Use the variable `id` correctly
+      const result = await Book.findByIdAndUpdate(id, req.body, { new: true });
+  
+      if (!result) {
+        return res.status(404).json({ message: "Book not found" });
+      }
+  
+      // Return the updated book
+      res.status(200).json(result);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send({ message: err.message });
     }
-
-    const { id } = req.params;
-    const result = await Book.findByIdAndUpdate("id", req.body);
-
-    if (!result) {
-      return res.status.apply(404).json({ message: "book not found" });
-    }
-  } catch (err) {
-    console.log(err);
-    res.status(500).send({ message: err.message });
-  }
-});
+  });
+  
 
 router.delete("/:id", async (req, res) => {
   try {
